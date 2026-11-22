@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Brand colour: deep ink blue. Change these to re-colour the whole app. */
+  --color-brand-50: #f0f4fa;
+  --color-brand-100: #dde7f4;
+  --color-brand-200: #bccfe9;
+  --color-brand-300: #8fadd8;
+  --color-brand-400: #5f86c2;
+  --color-brand-500: #3d66a8;
+  --color-brand-600: #2e5189;
+  --color-brand-700: #264270;
+  --color-brand-800: #21365b;
+  --color-brand-900: #1b2b49;
+  --color-brand-950: #111c31;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f9;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0b1220;
+    color: #f1f5f9;
+  }
 }
