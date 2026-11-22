@@ -27,3 +27,7 @@ export const driveApi = {
   status: () => call<DriveStatus>("/api/drive/status"),
   sync: (id: string, action: "sync" | "trash") => call<Entry>(`/api/entries/${id}/sync`, { method: "POST", body: JSON.stringify({ action }) }),
 };
+
+export const healthApi = {
+  get: () => call<{ lastPing: string | null }>("/api/health"),
+};

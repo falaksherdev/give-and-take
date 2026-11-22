@@ -1,9 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
 import type { Row } from "@/lib/types";
-import { buildPeople, eventTotals, fmt, GROUPS, rs } from "@/lib/utils";
-import RowItem from "./RowItem";
-import { C, Empty, GET, GIVE, LINK, Modal, seg, Spinner } from "./ui";
+import { buildPeople, eventTotals, fmt, GROUPS, rs, today } from "@/lib/utils";
+import { C, Empty, GET, GIVE, LINK, Modal, seg, Spinner, WARN } from "./ui";
 
 export default function PeopleView({ rows, groups, busy, onOpen, onGroup, onRename }: {
   rows: Row[];
@@ -29,26 +28,50 @@ export default function PeopleView({ rows, groups, busy, onOpen, onGroup, onRena
   if (p) {
     const d = p.r - p.g;
     const grp = groups[p.key];
+    const t0 = today();
+    const loans = rows.filter((x) => x.event === "Loan" && x.date <= t0 && x.name.trim().toLowerCase() === p.key);
+    const line = (x: Row, amountClass: string, label: string, extra?: string) => (
+      <button key={x.id + x.i} onClick={() => onOpen(x.id)} className="flex w-full items-start justify-between gap-3 border-t border-slate-100 py-3 text-left first:border-0 dark:border-slate-800">
+        <span className="min-w-0">
+          <span className="block font-semibold">{x.title || x.event}</span>
+          <span className="block text-sm text-slate-500 dark:text-slate-400">{fmt(x.date)}{x.title ? ` · ${x.event}` : ""}</span>
+          {extra && <span className="block text-xs text-slate-400">{extra}</span>}
+        </span>
+        <span className={`shrink-0 whitespace-nowrap text-right font-semibold ${amountClass}`}>
+          {x.amount ? rs(x.amount) : "Gift"}
+          <span className="block text-xs font-normal text-slate-500">{label}</span>
+        </span>
+      </button>
+    );
     return (
       <div className={C.card}>
         <button onClick={() => setSel(null)} className={`mb-3 text-sm font-semibold ${LINK}`}>← All people</button>
         <div className="flex items-start justify-between gap-3">
-          <h2 className="min-w-0 text-xl font-bold tracking-tight">{p.name}</h2>
-          <button onClick={() => setRen(p.name)} className={`text-sm font-semibold ${LINK}`}>Rename or merge</button>
+          <h2 className="min-w-0 text-xl font-bold tracking-tight">{p.name}{grp && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 align-middle text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{grp}</span>}</h2>
+          <button onClick={() => setRen(p.name)} className={`shrink-0 text-sm font-semibold ${LINK}`}>Rename or merge</button>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">You gave</p><p className={`font-semibold ${GIVE}`}>{rs(p.g)}</p></div>
-          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">You received</p><p className={`font-semibold ${GET}`}>{rs(p.r)}</p></div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">You gave</p><p className={`text-sm font-bold ${GIVE}`}>{rs(p.g)}</p></div>
+          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">You received</p><p className={`text-sm font-bold ${GET}`}>{rs(p.r)}</p></div>
+          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">{d === 0 ? "Balance" : d > 0 ? "They gave more" : "You gave more"}</p><p className="text-sm font-bold">{d === 0 ? "Even" : rs(Math.abs(d))}</p></div>
         </div>
-        <div className="my-3 flex flex-wrap gap-2">
+        <div className="my-3 rounded-lg bg-amber-100 p-3 text-sm text-amber-950 dark:bg-amber-950/60 dark:text-amber-100">
+          {d > 0 ? `They gave you ${rs(d)} more. Give at least ${rs(d)} next time to be even.` : d < 0 ? `You gave ${rs(-d)} more. You are ahead.` : "You are even."}
+        </div>
+        <div className="mb-4 flex flex-wrap gap-2">
           {GROUPS.map((g) => (
             <button key={g} onClick={() => onGroup(p.key, grp === g ? "" : g)} className={`rounded-full px-3 py-1 text-sm font-semibold ring-1 ring-slate-300 dark:ring-slate-600 ${grp === g ? "bg-brand-700 text-white ring-0" : ""}`}>{g}</button>
           ))}
         </div>
-        <div className="mb-3 rounded-lg bg-amber-100 p-3 text-sm text-amber-950 dark:bg-amber-950/60 dark:text-amber-100">
-          {d > 0 ? `They gave you ${rs(d)} more. Give at least ${rs(d)} next time to be even.` : d < 0 ? `You gave ${rs(-d)} more. You are ahead.` : "You are even."}
-        </div>
-        {p.rows.map((x) => <RowItem key={x.id + x.i} x={x} onOpen={onOpen} />)}
+        <a href={`/api/people/statement?name=${encodeURIComponent(p.name)}`} className={`${C.btn2} w-full`}>Download statement (PDF)</a>
+        <h3 className="mb-1 mt-5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Everything with {p.name}</h3>
+        {p.rows.map((x) => line(x, x.type === "given" ? GIVE : GET, x.type === "given" ? "You gave" : "You received", [x.forWho && `For: ${x.forWho}`, x.item && `Item: ${x.item}`].filter(Boolean).join(" · ") || undefined))}
+        {loans.length > 0 && (
+          <>
+            <h3 className="mb-1 mt-5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Loans (not in the totals)</h3>
+            {loans.map((x) => line(x, x.paid ? GET : WARN, `${x.type === "given" ? "You lent" : "You borrowed"} · ${x.paid ? "paid back" : "not paid back"}`))}
+          </>
+        )}
         {ren !== null && (
           <Modal>
             <h3 className="text-lg font-bold">Rename or merge</h3>

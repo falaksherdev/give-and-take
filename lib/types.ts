@@ -31,5 +31,6 @@ export type Row = {
   item: string;
   note: string;
   name: string;
+  forWho: string;
   amount: number;
 };

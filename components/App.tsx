@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { api, driveApi, peopleApi, type DriveStatus } from "@/lib/api";
+import { api, driveApi, healthApi, peopleApi, type DriveStatus } from "@/lib/api";
 import type { Entry, EntryInput } from "@/lib/types";
 import { buildPeople, fmt, today, toRows } from "@/lib/utils";
 import FormView from "./FormView";
@@ -26,6 +26,7 @@ export default function App({ email, name, signOutAction }: { email: string; nam
   const [groups, setGroups] = useState<Record<string, string>>({});
   const [syncing, setSyncing] = useState<string[]>([]);
   const [drive, setDrive] = useState<DriveStatus | null>(null);
+  const [lastPing, setLastPing] = useState<string | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [view, setView] = useState<View>("home");
   const [editing, setEditing] = useState<Entry | null>(null);
@@ -47,8 +48,8 @@ export default function App({ email, name, signOutAction }: { email: string; nam
 
   const load = useCallback(() => {
     setState("loading");
-    Promise.all([api.list(), peopleApi.profile(), driveApi.status().catch(() => null)])
-      .then(([d, p, s]) => { setEntries(d.entries); setTrash(d.trash); setGroups(p.groups); setDrive(s); setState("ready"); })
+    Promise.all([api.list(), peopleApi.profile(), driveApi.status().catch(() => null), healthApi.get().catch(() => null)])
+      .then(([d, p, s, h]) => { setEntries(d.entries); setTrash(d.trash); setGroups(p.groups); setDrive(s); setLastPing(h?.lastPing ?? null); setState("ready"); })
       .catch(() => setState("error"));
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -165,7 +166,7 @@ export default function App({ email, name, signOutAction }: { email: string; nam
   );
   else if (view === "home") body = <HomeView rows={rows} onOpen={open} />;
   else if (view === "add") body = <FormView key={editing?.id ?? "new"} initial={editing} rows={rows} busy={busy === "save"} onSave={save} onError={(m) => toast(m, "error")} onCancel={() => { setEditing(null); setView("receipt"); }} />;
-  else if (view === "history") body = <HistoryView rows={rows} selected={rec} onOpen={open}
+  else if (view === "history") body = <HistoryView entries={entries} selected={rec} onOpen={open}
     aside={receipt ?? <div className={`${C.card} text-center text-sm text-slate-500`}>Select a row to see its receipt</div>} />;
   else if (view === "receipt") body = receipt ? (
     <><button onClick={() => go("history")} className={`mb-3 text-sm font-semibold ${LINK}`}>← Back to history</button><div className="max-w-sm">{receipt}</div></>
@@ -195,6 +196,15 @@ export default function App({ email, name, signOutAction }: { email: string; nam
             {drive.sheetUrl && <a href={drive.sheetUrl} target="_blank" rel="noreferrer" className={C.btn2}>Open Sheet</a>}
           </div>
         )}
+      </section>
+      <section className={C.card}>
+        <h2 className="font-bold">Database</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          A small job runs once a day so your free database never goes to sleep from inactivity.
+        </p>
+        <p className="mt-2 text-sm font-medium">
+          {lastPing ? `Last daily check: ${fmt(lastPing.slice(0, 10))}` : "Not run yet. It starts a day after the site is live."}
+        </p>
       </section>
       <section className={C.card}>
         <h2 className="font-bold">Trash</h2>

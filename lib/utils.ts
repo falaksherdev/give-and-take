@@ -16,7 +16,7 @@ export function toRows(entries: Entry[]): Row[] {
     .flatMap((e) =>
       e.people.map((p, i) => ({
         id: e.id, i, type: e.type, event: e.event, title: e.title, date: e.date,
-        paid: e.paid, sync: e.sync, item: e.item, note: e.note, name: p.name, amount: p.amount,
+        paid: e.paid, sync: e.sync, item: e.item, note: e.note, name: p.name, forWho: p.forWho ?? "", amount: p.amount,
       })),
     )
     .sort((a, b) => b.date.localeCompare(a.date));
@@ -58,7 +58,7 @@ export function lastTime(rows: Row[], x: Row) {
 }
 
 export type Tone = "ok" | "warn" | "info";
-export function status(x: Row): { label: string; tone: Tone } {
+export function status(x: Pick<Row, "date" | "sync" | "event" | "paid">): { label: string; tone: Tone } {
   if (x.date > today()) return { label: "Upcoming", tone: "info" };
   if (x.sync === "failed") return { label: "Drive failed", tone: "warn" };
   if (x.sync === "pending") return { label: "Not on Drive yet", tone: "warn" };

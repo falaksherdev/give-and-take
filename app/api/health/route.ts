@@ -9,7 +9,13 @@ export async function GET() {
   try {
     const db = await getDb();
     await db.command({ ping: 1 });
-    return Response.json({ ok: true, email: session.user?.email, database: "connected" });
+    const ping = await db.collection<{ _id: string; lastPing?: Date }>("keepalive").findOne({ _id: "ping" });
+    return Response.json({
+      ok: true,
+      email: session.user?.email,
+      database: "connected",
+      lastPing: ping?.lastPing ? new Date(ping.lastPing).toISOString() : null,
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return Response.json({ ok: false, error: message }, { status: 500 });
