@@ -38,8 +38,8 @@ export default function HistoryView({ rows, selected, onOpen, aside }: {
           <button key={k} onClick={() => setFilter(k)} className={seg(filter === k, k === "given")}>{k[0].toUpperCase() + k.slice(1)}</button>
         ))}
       </div>
-      <div className="grid items-start gap-5 lg:grid-cols-[1fr_22rem]">
-        <div>
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0">
           <div className={`${C.card} lg:hidden`}>{list.length ? list.map((x) => <RowItem key={x.id + x.i} x={x} onOpen={onOpen} />) : none}</div>
           <div className={`${C.card} hidden overflow-x-auto lg:block`}>
             {list.length ? (
@@ -54,12 +54,12 @@ export default function HistoryView({ rows, selected, onOpen, aside }: {
                     const sel = selected === x.id;
                     return (
                       <tr key={x.id + x.i} onClick={() => onOpen(x.id)} className={`cursor-pointer border-b border-slate-100 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60 ${sel ? "bg-slate-50 dark:bg-slate-800/60" : ""}`}>
-                        <td className="px-3 py-2.5">{fmt(x.date)}</td>
-                        <td className="px-3 py-2.5 font-semibold">{x.name}</td>
-                        <td className="px-3 py-2.5">{x.title || x.event}</td>
-                        <td className={`px-3 py-2.5 font-medium ${g ? GIVE : GET}`}>{g ? "Given" : "Received"}</td>
-                        <td className="px-3 py-2.5 font-semibold">{x.amount ? rs(x.amount) : "Gift"}</td>
-                        <td className={`px-3 py-2.5 font-medium ${toneClass[s.tone]}`}>{s.label === "Saved" ? "✓ Saved" : s.label}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5">{fmt(x.date)}</td>
+                        <td className="max-w-[11rem] truncate px-3 py-2.5 font-semibold" title={x.name}>{x.name}</td>
+                        <td className="max-w-[11rem] truncate px-3 py-2.5" title={x.title || x.event}>{x.title || x.event}</td>
+                        <td className={`whitespace-nowrap px-3 py-2.5 font-medium ${g ? GIVE : GET}`}>{g ? "Given" : "Received"}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5 font-semibold">{x.amount ? rs(x.amount) : "Gift"}</td>
+                        <td className={`whitespace-nowrap px-3 py-2.5 font-medium ${toneClass[s.tone]}`}>{s.label === "Saved" ? "✓ Saved" : s.label}</td>
                       </tr>
                     );
                   })}
@@ -68,7 +68,7 @@ export default function HistoryView({ rows, selected, onOpen, aside }: {
             ) : none}
           </div>
         </div>
-        <aside className="sticky top-4 hidden lg:block">{aside}</aside>
+        <aside className="sticky top-4 hidden xl:block">{aside}</aside>
       </div>
     </>
   );

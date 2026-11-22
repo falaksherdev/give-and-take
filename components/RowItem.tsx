@@ -16,7 +16,7 @@ export default function RowItem({ x, onOpen }: { x: Row; onOpen: (id: string) =>
         <span className="block truncate text-sm text-slate-500 dark:text-slate-400">{x.title || x.event} · {fmt(x.date)}</span>
         {s.label !== "Saved" && <span className={`block text-xs font-semibold ${toneClass[s.tone]}`}>{s.label}</span>}
       </span>
-      <span className={`font-bold ${g ? GIVE : GET}`}>{x.amount ? rs(x.amount) : "Gift"}</span>
+      <span className={`shrink-0 whitespace-nowrap font-semibold ${g ? GIVE : GET}`}>{x.amount ? rs(x.amount) : "Gift"}</span>
     </button>
   );
 }

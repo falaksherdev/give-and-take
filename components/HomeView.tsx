@@ -54,7 +54,7 @@ export default function HomeView({ rows, onOpen }: { rows: Row[]; onOpen: (id: s
           <H2>Upcoming</H2>
           {up.map((x) => (
             <button key={x.id + x.i} onClick={() => onOpen(x.id)} className="block w-full border-t border-slate-100 py-3 text-left first:border-0 dark:border-slate-800">
-              <span className="flex justify-between gap-2"><b>{x.name}</b><span className={`text-sm font-semibold ${INFO}`}>{fmt(x.date)}</span></span>
+              <span className="flex justify-between gap-2"><b className="min-w-0">{x.name}</b><span className={`shrink-0 whitespace-nowrap text-sm font-semibold ${INFO}`}>{fmt(x.date)}</span></span>
               <span className="block text-sm text-slate-500 dark:text-slate-400">{x.title || x.event} · planned {x.amount ? rs(x.amount) : "gift"}</span>
               <span className="block text-sm">{lastTime(rows, x)}</span>
             </button>

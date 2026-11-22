@@ -60,7 +60,7 @@ export default function App({ email, name, signOutAction }: { email: string; nam
   function go(v: View) { setEditing(null); setView(v); window.scrollTo(0, 0); }
   function open(id: string) {
     setRec(id);
-    if (!(view === "history" && window.matchMedia("(min-width:1024px)").matches)) { setView("receipt"); window.scrollTo(0, 0); }
+    if (!(view === "history" && window.matchMedia("(min-width:1280px)").matches)) { setView("receipt"); window.scrollTo(0, 0); }
   }
 
   async function save(input: EntryInput) {
@@ -210,7 +210,7 @@ export default function App({ email, name, signOutAction }: { email: string; nam
   );
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] font-sans tabular-nums text-slate-900 dark:bg-[#0b1220] dark:text-slate-100">
+    <div className="min-h-screen bg-[#f4f6f9] font-sans tabular-nums [overflow-wrap:anywhere] text-slate-900 dark:bg-[#0b1220] dark:text-slate-100">
       <ToastList toasts={toasts} onClose={closeToast} />
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:inset-y-0 lg:right-auto lg:w-60 lg:flex-col lg:justify-start lg:gap-1 lg:border-r lg:border-t-0 lg:p-4">
         <div className="mb-5 hidden items-center gap-3 px-4 pt-2 lg:flex"><span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-800 text-sm font-bold text-white">G</span><span className="text-lg font-bold tracking-tight">Give and Take</span></div>
@@ -225,7 +225,7 @@ export default function App({ email, name, signOutAction }: { email: string; nam
         })}
       </nav>
       <div className="lg:pl-60">
-        <div className="mx-auto max-w-md px-4 pb-28 pt-4 lg:max-w-5xl lg:pb-10">
+        <div className="mx-auto max-w-md px-4 pb-28 pt-4 lg:max-w-5xl lg:pb-10 xl:max-w-6xl">
           <div className="mb-5"><h1 className="text-2xl font-bold tracking-tight">{view === "add" && editing ? "Edit entry" : TITLES[view]}</h1>{view === "home" && <p className="text-sm text-slate-500 dark:text-slate-400">Welcome back, {name.split(" ")[0] || "there"}</p>}</div>
           {body}
         </div>

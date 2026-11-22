@@ -33,7 +33,7 @@ export default function PeopleView({ rows, groups, busy, onOpen, onGroup, onRena
       <div className={C.card}>
         <button onClick={() => setSel(null)} className={`mb-3 text-sm font-semibold ${LINK}`}>← All people</button>
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-xl font-bold tracking-tight">{p.name}</h2>
+          <h2 className="min-w-0 text-xl font-bold tracking-tight">{p.name}</h2>
           <button onClick={() => setRen(p.name)} className={`text-sm font-semibold ${LINK}`}>Rename or merge</button>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3">
@@ -75,8 +75,8 @@ export default function PeopleView({ rows, groups, busy, onOpen, onGroup, onRena
         <div className={C.card}>
           {events.length ? events.map((o) => (
             <div key={o.name} className="flex items-center justify-between gap-3 border-t border-slate-100 py-3 first:border-0 dark:border-slate-800">
-              <div><p className="font-semibold">{o.name}</p><p className="text-sm text-slate-500 dark:text-slate-400">{fmt(o.date)} · {o.people.size} {o.people.size > 1 ? "people" : "person"}</p></div>
-              <div className="text-right text-sm font-semibold">
+              <div className="min-w-0"><p className="font-semibold">{o.name}</p><p className="text-sm text-slate-500 dark:text-slate-400">{fmt(o.date)} · {o.people.size} {o.people.size > 1 ? "people" : "person"}</p></div>
+              <div className="shrink-0 whitespace-nowrap text-right text-sm font-semibold">
                 {o.r > 0 && <span className={`block ${GET}`}>Received {rs(o.r)}</span>}
                 {o.g > 0 && <span className={`block ${GIVE}`}>Given {rs(o.g)}</span>}
               </div>
@@ -92,11 +92,11 @@ export default function PeopleView({ rows, groups, busy, onOpen, onGroup, onRena
               const grp = groups[x.key];
               return (
                 <button key={x.key} onClick={() => setSel(x.key)} className="flex w-full items-center justify-between gap-3 border-t border-slate-100 py-3 text-left first:border-0 dark:border-slate-800">
-                  <span>
+                  <span className="min-w-0">
                     <span className="block font-semibold">{x.name}{grp && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{grp}</span>}</span>
                     <span className="block text-sm text-slate-500 dark:text-slate-400">Given {rs(x.g)} · Received {rs(x.r)}</span>
                   </span>
-                  <span className={`text-right text-sm font-semibold ${d >= 0 ? GET : GIVE}`}>
+                  <span className={`shrink-0 whitespace-nowrap text-right text-sm font-semibold ${d >= 0 ? GET : GIVE}`}>
                     {d === 0 ? "Even" : <>{rs(Math.abs(d))}<span className="block text-xs font-normal text-slate-500">{d > 0 ? "They gave more" : "You gave more"}</span></>}
                   </span>
                 </button>
